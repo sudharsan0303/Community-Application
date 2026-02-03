@@ -1,0 +1,699 @@
+{% extends "layout.html" %}
+
+{% block title %}Admin Dashboard - Community Helper Hub{% endblock %}
+
+{% block additional_css %}
+<style>
+    .dashboard-container {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: var(--space-lg);
+        margin: var(--space-lg) 0;
+    }
+    
+    .sidebar {
+        background-color: var(--color-card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--color-card-border);
+        padding: var(--space-md);
+        height: fit-content;
+    }
+    
+    .admin-info {
+        text-align: center;
+        padding-bottom: var(--space-md);
+        margin-bottom: var(--space-md);
+        border-bottom: 1px solid var(--color-border);
+    }
+    
+    .admin-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto var(--space-md);
+        border: 3px solid var(--color-bg-accent);
+    }
+    
+    .admin-name {
+        font-weight: 600;
+        margin-bottom: var(--space-xs);
+    }
+    
+    .admin-role {
+        display: inline-block;
+        padding: var(--space-xs) var(--space-sm);
+        border-radius: var(--radius-full);
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        margin-bottom: var(--space-md);
+        background-color: var(--color-bg-accent);
+        color: white;
+    }
+    
+    .nav-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .nav-item {
+        margin-bottom: var(--space-xs);
+    }
+    
+    .nav-link {
+        display: flex;
+        align-items: center;
+        padding: var(--space-sm) var(--space-md);
+        border-radius: var(--radius-md);
+        color: var(--color-text-primary);
+        text-decoration: none;
+        transition: var(--transition-normal);
+    }
+    
+    .nav-link:hover {
+        background-color: var(--color-bg-secondary);
+    }
+    
+    .nav-link.active {
+        background-color: var(--color-bg-accent);
+        color: white;
+    }
+    
+    .nav-icon {
+        margin-right: var(--space-sm);
+        width: 20px;
+        text-align: center;
+    }
+    
+    .main-content {
+        min-height: 500px;
+    }
+    
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-lg);
+    }
+    
+    .dashboard-title {
+        margin: 0;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-md);
+        margin-bottom: var(--space-lg);
+    }
+    
+    .stat-card {
+        background-color: var(--color-card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--color-card-border);
+        padding: var(--space-md);
+        text-align: center;
+    }
+    
+    .stat-value {
+        font-size: var(--font-size-2xl);
+        font-weight: 700;
+        color: var(--color-bg-accent);
+        margin-bottom: var(--space-xs);
+    }
+    
+    .stat-label {
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-sm);
+    }
+    
+    .verification-section,
+    .complaints-section,
+    .users-section {
+        background-color: var(--color-card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--color-card-border);
+        padding: var(--space-lg);
+        margin-bottom: var(--space-lg);
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-md);
+    }
+    
+    .section-title {
+        margin: 0;
+    }
+    
+    .verification-list,
+    .complaints-list,
+    .users-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .verification-item,
+    .complaint-item,
+    .user-item {
+        padding: var(--space-md);
+        border-bottom: 1px solid var(--color-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .verification-item:last-child,
+    .complaint-item:last-child,
+    .user-item:last-child {
+        border-bottom: none;
+    }
+    
+    .verification-info,
+    .complaint-info,
+    .user-info {
+        flex: 1;
+    }
+    
+    .verification-title,
+    .complaint-title,
+    .user-title {
+        font-weight: 600;
+        margin-bottom: var(--space-xs);
+    }
+    
+    .verification-meta,
+    .complaint-meta,
+    .user-meta {
+        display: flex;
+        color: var(--color-text-tertiary);
+        font-size: var(--font-size-sm);
+    }
+    
+    .meta-item {
+        display: flex;
+        align-items: center;
+        margin-right: var(--space-md);
+    }
+    
+    .meta-icon {
+        margin-right: var(--space-xs);
+    }
+    
+    .verification-actions,
+    .complaint-actions,
+    .user-actions {
+        display: flex;
+        gap: var(--space-sm);
+    }
+    
+    .status-badge {
+        padding: var(--space-xs) var(--space-sm);
+        border-radius: var(--radius-md);
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+    }
+    
+    .status-pending {
+        background-color: var(--color-status-pending-bg);
+        color: var(--color-status-pending-text);
+    }
+    
+    .status-verified {
+        background-color: var(--color-status-completed-bg);
+        color: var(--color-status-completed-text);
+    }
+    
+    .status-rejected {
+        background-color: var(--color-status-cancelled-bg);
+        color: var(--color-status-cancelled-text);
+    }
+    
+    .status-resolved {
+        background-color: var(--color-status-completed-bg);
+        color: var(--color-status-completed-text);
+    }
+    
+    .status-active {
+        background-color: var(--color-status-accepted-bg);
+        color: var(--color-status-accepted-text);
+    }
+    
+    .status-inactive {
+        background-color: var(--color-status-cancelled-bg);
+        color: var(--color-status-cancelled-text);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: var(--space-xl) 0;
+        color: var(--color-text-tertiary);
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: var(--space-md);
+        opacity: 0.5;
+    }
+    
+    .chart-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: var(--space-lg);
+        margin-bottom: var(--space-lg);
+    }
+    
+    .chart-card {
+        background-color: var(--color-card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--color-card-border);
+        padding: var(--space-lg);
+    }
+    
+    .chart-title {
+        margin-top: 0;
+        margin-bottom: var(--space-md);
+        text-align: center;
+    }
+    
+    .chart {
+        width: 100%;
+        height: 250px;
+    }
+    
+    @media (max-width: 768px) {
+        .dashboard-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .sidebar {
+            margin-bottom: var(--space-md);
+        }
+        
+        .admin-info {
+            display: flex;
+            align-items: center;
+            text-align: left;
+        }
+        
+        .admin-avatar {
+            width: 60px;
+            height: 60px;
+            margin: 0 var(--space-md) 0 0;
+        }
+        
+        .admin-details {
+            flex: 1;
+        }
+        
+        .nav-menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+        }
+        
+        .nav-item {
+            margin-bottom: 0;
+        }
+        
+        .chart-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <div class="admin-info">
+                <img src="{{ admin.profile_picture or 'https://via.placeholder.com/150' }}" alt="{{ admin.name }}" class="admin-avatar">
+                <div class="admin-details">
+                    <h3 class="admin-name">{{ admin.name }}</h3>
+                    <div class="admin-role">Administrator</div>
+                    <a href="/admin/profile" class="btn btn-outline btn-sm">Edit Profile</a>
+                </div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/admin/dashboard" class="nav-link active">
+                        <span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/users" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-users"></i></span>
+                        Users Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/helpers" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-hands-helping"></i></span>
+                        Helpers Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/verifications" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-user-check"></i></span>
+                        Verifications
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/requests" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-clipboard-list"></i></span>
+                        Service Requests
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/complaints" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-exclamation-circle"></i></span>
+                        Complaints
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/feedback" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-star"></i></span>
+                        Feedback
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/settings" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                        Settings
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Admin Dashboard</h1>
+                <a href="/admin/new" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i> Add Admin
+                </a>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.total_users }}</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.total_helpers }}</div>
+                    <div class="stat-label">Total Helpers</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.pending_verifications }}</div>
+                    <div class="stat-label">Pending Verifications</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.open_complaints }}</div>
+                    <div class="stat-label">Open Complaints</div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-card">
+                    <h3 class="chart-title">User Growth</h3>
+                    <canvas id="userGrowthChart" class="chart"></canvas>
+                </div>
+                
+                <div class="chart-card">
+                    <h3 class="chart-title">Service Requests by Category</h3>
+                    <canvas id="requestCategoryChart" class="chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="verification-section">
+                <div class="section-header">
+                    <h2 class="section-title">Pending Verifications</h2>
+                    <a href="/admin/verifications" class="btn btn-text">View All</a>
+                </div>
+                
+                {% if pending_verifications %}
+                <ul class="verification-list">
+                    {% for verification in pending_verifications %}
+                    <li class="verification-item">
+                        <div class="verification-info">
+                            <h3 class="verification-title">{{ verification.helper.name }}</h3>
+                            <div class="verification-meta">
+                                <span class="meta-item">
+                                    <i class="fas fa-calendar meta-icon"></i>
+                                    {{ verification.date_submitted }}
+                                </span>
+                                <span class="meta-item">
+                                    <i class="fas fa-tag meta-icon"></i>
+                                    {{ verification.helper.service_category }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="verification-actions">
+                            <a href="/admin/verification/{{ verification.id }}" class="btn btn-sm btn-outline">Review</a>
+                            <a href="/admin/verification/{{ verification.id }}/approve" class="btn btn-sm btn-primary">Approve</a>
+                            <a href="/admin/verification/{{ verification.id }}/reject" class="btn btn-sm btn-danger">Reject</a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fas fa-user-check"></i></div>
+                    <h3>No pending verifications</h3>
+                    <p>All helper verification requests have been processed.</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="complaints-section">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Complaints</h2>
+                    <a href="/admin/complaints" class="btn btn-text">View All</a>
+                </div>
+                
+                {% if recent_complaints %}
+                <ul class="complaints-list">
+                    {% for complaint in recent_complaints %}
+                    <li class="complaint-item">
+                        <div class="complaint-info">
+                            <h3 class="complaint-title">{{ complaint.title }}</h3>
+                            <div class="complaint-meta">
+                                <span class="meta-item">
+                                    <i class="fas fa-calendar meta-icon"></i>
+                                    {{ complaint.date_submitted }}
+                                </span>
+                                <span class="meta-item">
+                                    <i class="fas fa-user meta-icon"></i>
+                                    {{ complaint.user.name }}
+                                </span>
+                                {% if complaint.helper %}
+                                <span class="meta-item">
+                                    <i class="fas fa-hands-helping meta-icon"></i>
+                                    Against: {{ complaint.helper.name }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="complaint-actions">
+                            <div class="status-badge status-{{ complaint.status.lower() }}">{{ complaint.status }}</div>
+                            <a href="/admin/complaint/{{ complaint.id }}" class="btn btn-sm btn-outline">Review</a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fas fa-exclamation-circle"></i></div>
+                    <h3>No recent complaints</h3>
+                    <p>There are no recent complaints to review.</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="users-section">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Users</h2>
+                    <a href="/admin/users" class="btn btn-text">View All</a>
+                </div>
+                
+                {% if recent_users %}
+                <ul class="users-list">
+                    {% for user in recent_users %}
+                    <li class="user-item">
+                        <div class="user-info">
+                            <h3 class="user-title">{{ user.name }}</h3>
+                            <div class="user-meta">
+                                <span class="meta-item">
+                                    <i class="fas fa-envelope meta-icon"></i>
+                                    {{ user.email }}
+                                </span>
+                                <span class="meta-item">
+                                    <i class="fas fa-calendar meta-icon"></i>
+                                    Joined: {{ user.date_joined }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="user-actions">
+                            <div class="status-badge status-{{ user.status.lower() }}">{{ user.status }}</div>
+                            <a href="/admin/user/{{ user.id }}" class="btn btn-sm btn-outline">View</a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fas fa-users"></i></div>
+                    <h3>No recent users</h3>
+                    <p>There are no recently registered users.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate stats on page load
+        const statValues = document.querySelectorAll('.stat-value');
+        
+        statValues.forEach(stat => {
+            const finalValue = stat.textContent;
+            let startValue = 0;
+            const duration = 1000;
+            const increment = Math.ceil(finalValue / (duration / 20));
+            
+            const animateValue = () => {
+                startValue += increment;
+                if (startValue > finalValue) {
+                    stat.textContent = finalValue;
+                } else {
+                    stat.textContent = startValue;
+                    requestAnimationFrame(animateValue);
+                }
+            };
+            
+            animateValue();
+        });
+        
+        // User Growth Chart
+        const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
+        const userGrowthChart = new Chart(userGrowthCtx, {
+            type: 'line',
+            data: {
+                labels: {{ user_growth_data.labels|tojson }},
+                datasets: [{
+                    label: 'Users',
+                    data: {{ user_growth_data.users|tojson }},
+                    borderColor: '#4CAF50',
+                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                }, {
+                    label: 'Helpers',
+                    data: {{ user_growth_data.helpers|tojson }},
+                    borderColor: '#2196F3',
+                    backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Service Requests by Category Chart
+        const requestCategoryCtx = document.getElementById('requestCategoryChart').getContext('2d');
+        const requestCategoryChart = new Chart(requestCategoryCtx, {
+            type: 'doughnut',
+            data: {
+                labels: {{ request_category_data.labels|tojson }},
+                datasets: [{
+                    data: {{ request_category_data.values|tojson }},
+                    backgroundColor: [
+                        '#4CAF50',
+                        '#2196F3',
+                        '#FFC107',
+                        '#9C27B0',
+                        '#F44336',
+                        '#FF9800',
+                        '#795548',
+                        '#607D8B'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+        
+        // Update charts when theme changes
+        const updateChartsForTheme = () => {
+            const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            const textColor = isDarkMode ? '#E0E0E0' : '#333333';
+            
+            Chart.defaults.color = textColor;
+            userGrowthChart.update();
+            requestCategoryChart.update();
+        };
+        
+        // Listen for theme changes
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'data-theme') {
+                    updateChartsForTheme();
+                }
+            });
+        });
+        
+        observer.observe(document.documentElement, { attributes: true });
+        
+        // Initial chart theme setup
+        updateChartsForTheme();
+    });
+</script>
+{% endblock %}

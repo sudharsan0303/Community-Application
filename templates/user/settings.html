@@ -1,0 +1,487 @@
+{% extends "layout.html" %}
+
+{% block page_title %}Settings{% endblock %}
+
+{% block extra_css %}
+<style>
+    .settings-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .settings-section {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .section-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .section-icon {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+        margin-right: 1rem;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-color);
+        margin: 0;
+    }
+    
+    .setting-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-light);
+    }
+    
+    .setting-item:last-child {
+        border-bottom: none;
+    }
+    
+    .setting-info {
+        flex: 1;
+    }
+    
+    .setting-label {
+        font-weight: 500;
+        color: var(--text-color);
+        margin-bottom: 0.25rem;
+    }
+    
+    .setting-description {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    .toggle-switch {
+        position: relative;
+        width: 50px;
+        height: 24px;
+        background-color: #ccc;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    
+    .toggle-switch.active {
+        background-color: var(--primary-color);
+    }
+    
+    .toggle-slider {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        background-color: white;
+        border-radius: 50%;
+        transition: transform 0.3s;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .toggle-switch.active .toggle-slider {
+        transform: translateX(26px);
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 500;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        background: var(--bg-color);
+        color: var(--text-color);
+        font-size: 1rem;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px var(--primary-light);
+    }
+    
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-primary {
+        background: var(--primary-color);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: var(--primary-dark);
+    }
+    
+    .btn-secondary {
+        background: var(--bg-light);
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+    }
+    
+    .btn-secondary:hover {
+        background: var(--border-color);
+    }
+    
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background: #c82333;
+    }
+    
+    .danger-zone {
+        border: 1px solid #dc3545;
+        border-radius: 8px;
+        padding: 1.5rem;
+        background: #fff5f5;
+    }
+    
+    .danger-zone h3 {
+        color: #dc3545;
+        margin-bottom: 1rem;
+    }
+    
+    .danger-zone p {
+        color: #721c24;
+        margin-bottom: 1rem;
+    }
+    
+    .privacy-info {
+        background: var(--bg-light);
+        border-left: 4px solid var(--primary-color);
+        padding: 1rem;
+        border-radius: 0 4px 4px 0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .privacy-info h4 {
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .privacy-info p {
+        color: var(--text-muted);
+        margin: 0;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    @media (max-width: 768px) {
+        .setting-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .btn-group {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1><i class="fas fa-cog"></i> Settings</h1>
+        <p class="page-description">Manage your account preferences and privacy settings</p>
+    </div>
+    
+    <div class="settings-container">
+        <form method="POST">
+            {{ csrf_token() }}
+            <!-- Account Information -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <i class="fas fa-user section-icon"></i>
+                    <h2 class="section-title">Account Information</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="name">Full Name</label>
+                    <input type="text" id="name" name="name" class="form-control" 
+                           value="{{ user.name if user else '' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-control" 
+                           value="{{ user.email if user else '' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" class="form-control" 
+                           value="{{ user.phone if user else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="location">Location</label>
+                    <input type="text" id="location" name="location" class="form-control" 
+                           value="{{ user.location if user else '' }}" 
+                           placeholder="City, State">
+                </div>
+            </div>
+            
+            <!-- Notification Preferences -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <i class="fas fa-bell section-icon"></i>
+                    <h2 class="section-title">Notification Preferences</h2>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Email Notifications</div>
+                        <div class="setting-description">
+                            Receive email notifications for new messages, service requests, and updates
+                        </div>
+                    </div>
+                    <div class="toggle-switch active" onclick="toggleSwitch(this, 'email_notifications')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <input type="hidden" name="email_notifications" value="on">
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">SMS Notifications</div>
+                        <div class="setting-description">
+                            Receive text message alerts for urgent updates and confirmations
+                        </div>
+                    </div>
+                    <div class="toggle-switch" onclick="toggleSwitch(this, 'sms_notifications')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <input type="hidden" name="sms_notifications" value="off">
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Push Notifications</div>
+                        <div class="setting-description">
+                            Receive browser push notifications when the app is closed
+                        </div>
+                    </div>
+                    <div class="toggle-switch active" onclick="toggleSwitch(this, 'push_notifications')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <input type="hidden" name="push_notifications" value="on">
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Marketing Communications</div>
+                        <div class="setting-description">
+                            Receive updates about new features, tips, and community news
+                        </div>
+                    </div>
+                    <div class="toggle-switch" onclick="toggleSwitch(this, 'marketing_notifications')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <input type="hidden" name="marketing_notifications" value="off">
+                </div>
+            </div>
+            
+            <!-- Privacy Settings -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <i class="fas fa-shield-alt section-icon"></i>
+                    <h2 class="section-title">Privacy & Security</h2>
+                </div>
+                
+                <div class="privacy-info">
+                    <h4>Your Privacy Matters</h4>
+                    <p>We respect your privacy and give you control over your personal information. 
+                       You can adjust these settings at any time to control what information is visible to other users.</p>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Profile Visibility</div>
+                        <div class="setting-description">
+                            Allow other users to view your profile and contact information
+                        </div>
+                    </div>
+                    <div class="toggle-switch active" onclick="toggleSwitch(this, 'profile_visible')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <input type="hidden" name="profile_visible" value="on">
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Show Phone Number</div>
+                        <div class="setting-description">
+                            Display your phone number on your public profile
+                        </div>
+                    </div>
+                    <div class="toggle-switch" onclick="toggleSwitch(this, 'show_phone')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <input type="hidden" name="show_phone" value="off">
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Activity Status</div>
+                        <div class="setting-description">
+                            Show when you were last active on the platform
+                        </div>
+                    </div>
+                    <div class="toggle-switch active" onclick="toggleSwitch(this, 'show_activity')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <input type="hidden" name="show_activity" value="on">
+                </div>
+            </div>
+            
+            <!-- Security Settings -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <i class="fas fa-lock section-icon"></i>
+                    <h2 class="section-title">Security</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="current_password">Current Password</label>
+                    <input type="password" id="current_password" name="current_password" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="new_password">New Password</label>
+                    <input type="password" id="new_password" name="new_password" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="confirm_password">Confirm New Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-control">
+                </div>
+                
+                <button type="button" class="btn btn-secondary" onclick="enableTwoFactor()">
+                    <i class="fas fa-shield-alt"></i> Enable Two-Factor Authentication
+                </button>
+            </div>
+            <br>
+            <!-- Save Changes -->
+            <div class="btn-group">
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                    <i class="fas fa-undo"></i> Reset Changes
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </form>
+        <br>
+        <!-- Danger Zone -->
+        <div class="settings-section">
+            <div class="danger-zone">
+                <h3><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
+                <p>Once you delete your account, there is no going back. Please be certain.</p>
+                <button type="button" class="btn btn-danger" onclick="confirmDeleteAccount()">
+                    <i class="fas fa-trash"></i> Delete Account
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleSwitch(element, inputName) {
+    element.classList.toggle('active');
+    const input = document.querySelector(`input[name="${inputName}"]`);
+    input.value = element.classList.contains('active') ? 'on' : 'off';
+}
+
+function resetForm() {
+    if (confirm('Are you sure you want to reset all changes?')) {
+        location.reload();
+    }
+}
+
+function enableTwoFactor() {
+    alert('Two-factor authentication setup will be available in a future update.');
+}
+
+function confirmDeleteAccount() {
+    const confirmation = prompt('Type "DELETE" to confirm account deletion:');
+    if (confirmation === 'DELETE') {
+        if (confirm('This action cannot be undone. Are you absolutely sure?')) {
+            // Handle account deletion
+            alert('Account deletion functionality will be implemented in a future update.');
+        }
+    }
+}
+
+// Password validation
+document.getElementById('new_password').addEventListener('input', function() {
+    const password = this.value;
+    const confirmPassword = document.getElementById('confirm_password');
+    
+    if (password.length > 0 && password.length < 8) {
+        this.setCustomValidity('Password must be at least 8 characters long');
+    } else {
+        this.setCustomValidity('');
+    }
+    
+    if (confirmPassword.value && confirmPassword.value !== password) {
+        confirmPassword.setCustomValidity('Passwords do not match');
+    } else {
+        confirmPassword.setCustomValidity('');
+    }
+});
+
+document.getElementById('confirm_password').addEventListener('input', function() {
+    const newPassword = document.getElementById('new_password').value;
+    
+    if (this.value !== newPassword) {
+        this.setCustomValidity('Passwords do not match');
+    } else {
+        this.setCustomValidity('');
+    }
+});
+</script>
+{% endblock %}

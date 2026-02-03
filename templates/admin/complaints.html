@@ -1,0 +1,694 @@
+{% extends "layout.html" %}
+
+{% block title %}Complaints Management - Community Helper Hub{% endblock %}
+
+{% block additional_css %}
+<style>
+    .complaints-container {
+        margin: var(--space-xl) 0;
+    }
+    
+    .complaints-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-lg);
+    }
+    
+    .complaints-title {
+        margin: 0;
+    }
+    
+    .filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-md);
+        margin-bottom: var(--space-lg);
+        padding: var(--space-md);
+        background-color: var(--color-card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--color-card-border);
+    }
+    
+    .filter-group {
+        display: flex;
+        align-items: center;
+    }
+    
+    .filter-label {
+        margin-right: var(--space-sm);
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    
+    .filter-select {
+        padding: var(--space-xs) var(--space-sm);
+        border: 1px solid var(--color-form-border);
+        border-radius: var(--radius-md);
+        background-color: var(--color-form-bg);
+        color: var(--color-text-primary);
+        font-size: var(--font-size-sm);
+    }
+    
+    .search-box {
+        flex: 1;
+        min-width: 200px;
+        position: relative;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: var(--space-xs) var(--space-sm) var(--space-xs) var(--space-xl);
+        border: 1px solid var(--color-form-border);
+        border-radius: var(--radius-md);
+        background-color: var(--color-form-bg);
+        color: var(--color-text-primary);
+        font-size: var(--font-size-sm);
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: var(--space-sm);
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--color-text-tertiary);
+    }
+    
+    .complaints-card {
+        background-color: var(--color-card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--color-card-border);
+        margin-bottom: var(--space-lg);
+        overflow: hidden;
+    }
+    
+    .complaints-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .complaints-table th,
+    .complaints-table td {
+        padding: var(--space-md);
+        text-align: left;
+        border-bottom: 1px solid var(--color-border);
+    }
+    
+    .complaints-table th {
+        background-color: var(--color-bg-secondary);
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    
+    .complaints-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .complaints-table tr:hover td {
+        background-color: var(--color-bg-hover);
+    }
+    
+    .complaint-id {
+        font-family: monospace;
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+    }
+    
+    .complaint-title {
+        font-weight: 600;
+        margin-bottom: var(--space-xs);
+    }
+    
+    .complaint-excerpt {
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-sm);
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .user-info {
+        display: flex;
+        align-items: center;
+    }
+    
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: var(--space-sm);
+    }
+    
+    .user-name {
+        font-weight: 600;
+        margin-bottom: 2px;
+        line-height: 1.2;
+    }
+    
+    .user-email {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-tertiary);
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: var(--space-xs) var(--space-sm);
+        border-radius: var(--radius-md);
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        text-align: center;
+        min-width: 100px;
+    }
+    
+    .status-pending {
+        background-color: var(--color-status-pending-bg);
+        color: var(--color-status-pending-text);
+    }
+    
+    .status-investigating {
+        background-color: var(--color-status-accepted-bg);
+        color: var(--color-status-accepted-text);
+    }
+    
+    .status-resolved {
+        background-color: var(--color-status-completed-bg);
+        color: var(--color-status-completed-text);
+    }
+    
+    .status-dismissed {
+        background-color: var(--color-status-cancelled-bg);
+        color: var(--color-status-cancelled-text);
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: var(--space-xs);
+    }
+    
+    .btn-icon {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-md);
+        background-color: var(--color-bg-secondary);
+        color: var(--color-text-primary);
+        border: none;
+        cursor: pointer;
+        transition: var(--transition-normal);
+    }
+    
+    .btn-icon:hover {
+        background-color: var(--color-bg-accent);
+        color: white;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: var(--space-lg);
+    }
+    
+    .pagination-item {
+        margin: 0 var(--space-xs);
+    }
+    
+    .pagination-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-md);
+        background-color: var(--color-bg-secondary);
+        color: var(--color-text-primary);
+        text-decoration: none;
+        transition: var(--transition-normal);
+    }
+    
+    .pagination-link:hover {
+        background-color: var(--color-bg-hover);
+    }
+    
+    .pagination-link.active {
+        background-color: var(--color-bg-accent);
+        color: white;
+    }
+    
+    .pagination-ellipsis {
+        color: var(--color-text-tertiary);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: var(--space-xl) 0;
+        color: var(--color-text-tertiary);
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: var(--space-md);
+        opacity: 0.5;
+    }
+    
+    @media (max-width: 992px) {
+        .complaints-table {
+            display: block;
+            overflow-x: auto;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .complaints-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--space-md);
+        }
+        
+        .filter-bar {
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+        
+        .filter-group {
+            width: 100%;
+        }
+        
+        .filter-select {
+            flex: 1;
+        }
+        
+        .search-box {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="complaints-container">
+        <div class="complaints-header">
+            <h1 class="complaints-title">Complaints Management</h1>
+            <a href="/admin/dashboard" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+        
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label for="status-filter" class="filter-label">Status:</label>
+                <select id="status-filter" class="filter-select">
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="investigating">Investigating</option>
+                    <option value="resolved">Resolved</option>
+                    <option value="dismissed">Dismissed</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="type-filter" class="filter-label">Type:</label>
+                <select id="type-filter" class="filter-select">
+                    <option value="all">All Types</option>
+                    <option value="service">Service</option>
+                    <option value="helper">Helper</option>
+                    <option value="platform">Platform</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="date-filter" class="filter-label">Date:</label>
+                <select id="date-filter" class="filter-select">
+                    <option value="all">All Time</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                    <option value="quarter">Last 3 Months</option>
+                </select>
+            </div>
+            
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="search-input" class="search-input" placeholder="Search complaints...">
+            </div>
+        </div>
+        
+        {% if complaints %}
+        <div class="complaints-card">
+            <table class="complaints-table">
+                <thead>
+                    <tr>
+                        <th>Complaint</th>
+                        <th>Submitted By</th>
+                        <th>Against</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for complaint in complaints %}
+                    <tr>
+                        <td>
+                            <div class="complaint-id">#{{ complaint.id }}</div>
+                            <div class="complaint-title">{{ complaint.title }}</div>
+                            <p class="complaint-excerpt">{{ complaint.description }}</p>
+                        </td>
+                        <td>
+                            <div class="user-info">
+                                <img src="{{ complaint.user.profile_picture or 'https://via.placeholder.com/32' }}" alt="{{ complaint.user.name }}" class="user-avatar">
+                                <div>
+                                    <div class="user-name">{{ complaint.user.name }}</div>
+                                    <div class="user-email">{{ complaint.user.email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if complaint.helper %}
+                            <div class="user-info">
+                                <img src="{{ complaint.helper.profile_picture or 'https://via.placeholder.com/32' }}" alt="{{ complaint.helper.name }}" class="user-avatar">
+                                <div>
+                                    <div class="user-name">{{ complaint.helper.name }}</div>
+                                    <div class="user-email">{{ complaint.helper.email }}</div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <span class="text-muted">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ complaint.date_submitted }}</td>
+                        <td>
+                            <div class="status-badge status-{{ complaint.status.lower() }}">{{ complaint.status }}</div>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="/admin/complaint/{{ complaint.id }}" class="btn-icon" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <button class="btn-icon" title="Change Status" onclick="openStatusModal('{{ complaint.id }}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon" title="Delete" onclick="confirmDelete('{{ complaint.id }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="pagination">
+            <div class="pagination-item">
+                <a href="?page=1" class="pagination-link" {% if current_page == 1 %}disabled{% endif %}>
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+            </div>
+            <div class="pagination-item">
+                <a href="?page={{ current_page - 1 }}" class="pagination-link" {% if current_page == 1 %}disabled{% endif %}>
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            </div>
+            
+            {% for page in pages %}
+                {% if page == current_page %}
+                <div class="pagination-item">
+                    <a href="?page={{ page }}" class="pagination-link active">{{ page }}</a>
+                </div>
+                {% elif page == '...' %}
+                <div class="pagination-item pagination-ellipsis">...</div>
+                {% else %}
+                <div class="pagination-item">
+                    <a href="?page={{ page }}" class="pagination-link">{{ page }}</a>
+                </div>
+                {% endif %}
+            {% endfor %}
+            
+            <div class="pagination-item">
+                <a href="?page={{ current_page + 1 }}" class="pagination-link" {% if current_page == total_pages %}disabled{% endif %}>
+                    <i class="fas fa-angle-right"></i>
+                </a>
+            </div>
+            <div class="pagination-item">
+                <a href="?page={{ total_pages }}" class="pagination-link" {% if current_page == total_pages %}disabled{% endif %}>
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div class="complaints-card">
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-exclamation-circle"></i></div>
+                <h3>No complaints found</h3>
+                <p>There are no complaints matching your filters.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Status Change Modal -->
+<div class="modal" id="statusModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Complaint Status</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeStatusModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="statusForm">
+                    <input type="hidden" id="complaint_id" name="complaint_id">
+                    
+                    <div class="form-group">
+                        <label for="status" class="form-label">Status</label>
+                        <select id="status" name="status" class="form-select">
+                            <option value="pending">Pending</option>
+                            <option value="investigating">Investigating</option>
+                            <option value="resolved">Resolved</option>
+                            <option value="dismissed">Dismissed</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea id="notes" name="notes" class="form-textarea" placeholder="Add notes about this status change..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeStatusModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="updateStatus()">Update Status</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+    
+    .modal-dialog {
+        max-width: 500px;
+        margin: 100px auto;
+    }
+    
+    .modal-content {
+        background-color: var(--color-card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--color-card-border);
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--space-md) var(--space-lg);
+        border-bottom: 1px solid var(--color-border);
+    }
+    
+    .modal-title {
+        margin: 0;
+        font-size: var(--font-size-lg);
+    }
+    
+    .close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--color-text-primary);
+    }
+    
+    .modal-body {
+        padding: var(--space-lg);
+    }
+    
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--space-md);
+        padding: var(--space-md) var(--space-lg);
+        border-top: 1px solid var(--color-border);
+    }
+    
+    .form-select {
+        width: 100%;
+        padding: var(--space-sm);
+        border: 1px solid var(--color-form-border);
+        border-radius: var(--radius-md);
+        background-color: var(--color-form-bg);
+        color: var(--color-text-primary);
+        font-size: var(--font-size-base);
+    }
+</style>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filter functionality
+        const statusFilter = document.getElementById('status-filter');
+        const typeFilter = document.getElementById('type-filter');
+        const dateFilter = document.getElementById('date-filter');
+        const searchInput = document.getElementById('search-input');
+        
+        function applyFilters() {
+            const status = statusFilter.value;
+            const type = typeFilter.value;
+            const date = dateFilter.value;
+            const search = searchInput.value.trim();
+            
+            // Build query string
+            let queryParams = [];
+            if (status !== 'all') queryParams.push(`status=${status}`);
+            if (type !== 'all') queryParams.push(`type=${type}`);
+            if (date !== 'all') queryParams.push(`date=${date}`);
+            if (search) queryParams.push(`search=${encodeURIComponent(search)}`);
+            
+            // Redirect with filters
+            const queryString = queryParams.length ? `?${queryParams.join('&')}` : '';
+            window.location.href = `/admin/complaints${queryString}`;
+        }
+        
+        // Apply filters on change
+        statusFilter.addEventListener('change', applyFilters);
+        typeFilter.addEventListener('change', applyFilters);
+        dateFilter.addEventListener('change', applyFilters);
+        
+        // Apply search on enter key
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                applyFilters();
+            }
+        });
+        
+        // Set filter values from URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('status')) statusFilter.value = urlParams.get('status');
+        if (urlParams.has('type')) typeFilter.value = urlParams.get('type');
+        if (urlParams.has('date')) dateFilter.value = urlParams.get('date');
+        if (urlParams.has('search')) searchInput.value = urlParams.get('search');
+    });
+    
+    // Status modal functionality
+    function openStatusModal(complaintId) {
+        document.getElementById('complaint_id').value = complaintId;
+        document.getElementById('statusModal').style.display = 'block';
+    }
+    
+    function closeStatusModal() {
+        document.getElementById('statusModal').style.display = 'none';
+    }
+    
+    function updateStatus() {
+        const complaintId = document.getElementById('complaint_id').value;
+        const status = document.getElementById('status').value;
+        const notes = document.getElementById('notes').value;
+        
+        // Submit using fetch API
+        fetch(`/admin/complaint/${complaintId}/status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                status: status,
+                notes: notes
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                closeStatusModal();
+                // Reload page to show updated status
+                window.location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating the status.');
+        });
+    }
+    
+    // Delete confirmation
+    function confirmDelete(complaintId) {
+        if (confirm('Are you sure you want to delete this complaint? This action cannot be undone.')) {
+            // Submit delete request
+            fetch(`/admin/complaint/${complaintId}/delete`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove row from table
+                    const row = document.querySelector(`tr[data-id="${complaintId}"]`);
+                    if (row) row.remove();
+                    else window.location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the complaint.');
+            });
+        }
+    }
+    
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('statusModal');
+        if (event.target == modal) {
+            closeStatusModal();
+        }
+    }
+</script>
+{% endblock %}

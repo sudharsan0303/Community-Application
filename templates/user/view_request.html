@@ -1,0 +1,340 @@
+{% extends "layout.html" %}
+
+{% block title %}View Service Request{% endblock %}
+
+{% block additional_css %}
+<style>
+    .request-container {
+        max-width: 900px;
+        margin: 2rem auto;
+    }
+    
+    .request-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .request-title {
+        color: #2c3e50;
+        margin: 0;
+        font-weight: 600;
+    }
+    
+    .request-status {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 500;
+        text-align: center;
+        min-width: 120px;
+    }
+    
+    .status-open {
+        background-color: #3498db;
+        color: white;
+    }
+    
+    .status-in-progress {
+        background-color: #f39c12;
+        color: white;
+    }
+    
+    .status-completed {
+        background-color: #2ecc71;
+        color: white;
+    }
+    
+    .status-cancelled {
+        background-color: #e74c3c;
+        color: white;
+    }
+    
+    .request-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .request-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .detail-item {
+        margin-bottom: 0.5rem;
+    }
+    
+    .detail-label {
+        font-weight: 500;
+        color: #7f8c8d;
+        margin-bottom: 0.25rem;
+    }
+    
+    .detail-value {
+        font-weight: 400;
+        color: #2c3e50;
+    }
+    
+    .description-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .description-label {
+        font-weight: 500;
+        color: #7f8c8d;
+        margin-bottom: 0.5rem;
+    }
+    
+    .description-content {
+        background-color: #f9f9f9;
+        padding: 1rem;
+        border-radius: 5px;
+        white-space: pre-line;
+    }
+    
+    .helper-section {
+        margin-top: 2rem;
+    }
+    
+    .helper-card {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+    }
+    
+    .helper-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 1rem;
+    }
+    
+    .helper-info {
+        flex-grow: 1;
+    }
+    
+    .helper-name {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .helper-rating {
+        color: #f39c12;
+        margin-bottom: 0.25rem;
+    }
+    
+    .helper-contact {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+    }
+    
+    .action-buttons {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 1.5rem;
+    }
+    
+    .btn-action {
+        padding: 0.5rem 1.5rem;
+        border-radius: 5px;
+        font-weight: 500;
+        cursor: pointer;
+        margin-left: 1rem;
+        border: none;
+    }
+    
+    .btn-cancel {
+        background-color: #e74c3c;
+        color: white;
+    }
+    
+    .btn-complete {
+        background-color: #2ecc71;
+        color: white;
+    }
+    
+    .btn-back {
+        background-color: #95a5a6;
+        color: white;
+    }
+    
+    .feedback-section {
+        margin-top: 2rem;
+    }
+    
+    .feedback-form {
+        background-color: #f9f9f9;
+        padding: 1.5rem;
+        border-radius: 10px;
+    }
+    
+    .star-rating {
+        display: flex;
+        margin-bottom: 1rem;
+    }
+    
+    .star-rating input {
+        display: none;
+    }
+    
+    .star-rating label {
+        cursor: pointer;
+        font-size: 1.5rem;
+        color: #ddd;
+        padding: 0 0.1rem;
+    }
+    
+    .star-rating input:checked ~ label {
+        color: #f39c12;
+    }
+    
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+        color: #f1c40f;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container request-container">
+    <div class="request-header">
+        <h2 class="request-title">Service Request #{{ service_request.id }}</h2>
+        <div class="request-status status-{{ service_request.status|lower|replace(' ', '-') }}">{{ service_request.status }}</div>
+    </div>
+    
+    <div class="request-card">
+        <div class="request-details">
+            <div class="detail-item">
+                <div class="detail-label">Category</div>
+                <div class="detail-value">{{ service_request.category }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Created On</div>
+                <div class="detail-value">{{ service_request.created_at }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Deadline</div>
+                <div class="detail-value">{{ service_request.deadline }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Title</div>
+                <div class="detail-value">{{ service_request.title }}</div>
+            </div>
+        </div>
+        
+        <div class="description-section">
+            <div class="description-label">Description</div>
+            <div class="description-content">
+                {{ service_request.description }}
+            </div>
+        </div>
+        
+        <!-- Helper section (shown only if a helper is assigned) -->
+        {% if helper %}
+        <div class="helper-section">
+            <h4>Assigned Helper</h4>
+            <div class="helper-card">
+                <img src="{{ helper.avatar }}" alt="Helper Avatar" class="helper-avatar">
+                <div class="helper-info">
+                    <div class="helper-name">{{ helper.name }}</div>
+                    <div class="helper-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        {{ helper.rating }}/5 ({{ helper.review_count }} reviews)
+                    </div>
+                    <div class="helper-contact">
+                        <i class="fas fa-envelope"></i> {{ helper.email }}
+                        <i class="fas fa-phone ml-2"></i> {{ helper.phone }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="action-buttons">
+            <a href="{{ url_for('user.dashboard') }}" class="btn btn-action btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            
+            <!-- Show cancel button only if status is Open or In Progress -->
+            {% if service_request.status == 'Open' or service_request.status == 'In Progress' %}
+            <button class="btn btn-action btn-cancel">
+                <i class="fas fa-times"></i> Cancel Request
+            </button>
+            {% endif %}
+            
+            <!-- Show complete button only if status is In Progress -->
+            {% if service_request.status == 'In Progress' %}
+            <button class="btn btn-action btn-complete">
+                <i class="fas fa-check"></i> Mark as Complete
+            </button>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Feedback section (shown only if status is Completed and no feedback given) -->
+    {% if service_request.status == 'Completed' and not feedback %}
+    <div class="feedback-section">
+        <h3>Leave Feedback</h3>
+        <form class="feedback-form" method="POST" action="#">
+            <div class="form-group">
+                <label>Rating</label>
+                <div class="star-rating">
+                    <input type="radio" id="star5" name="rating" value="5">
+                    <label for="star5"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="star4" name="rating" value="4">
+                    <label for="star4"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="star3" name="rating" value="3">
+                    <label for="star3"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="star2" name="rating" value="2">
+                    <label for="star2"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="star1" name="rating" value="1">
+                    <label for="star1"><i class="fas fa-star"></i></label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="comments">Comments</label>
+                <textarea class="form-control" id="comments" name="comments" rows="3" placeholder="Share your experience with this helper"></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-submit">Submit Feedback</button>
+        </form>
+    </div>
+    {% endif %}
+    
+    {% if feedback %}
+    <div class="feedback-section">
+        <h3>Your Feedback</h3>
+        <div class="feedback-form">
+            <div class="helper-rating mb-3">
+                {% for i in range(1, 6) %}
+                    {% if i <= feedback.rating %}
+                        <i class="fas fa-star"></i>
+                    {% else %}
+                        <i class="far fa-star"></i>
+                    {% endif %}
+                {% endfor %}
+                {{ feedback.rating }}/5
+            </div>
+            
+            <div class="feedback-comments">
+                <strong>Your comments:</strong>
+                <p>{{ feedback.comments }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
