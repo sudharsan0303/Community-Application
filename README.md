@@ -61,7 +61,7 @@ A full-stack web application that connects users with trusted local helpers in t
 
    ```
    git clone <repository-url>
-   cd community-helper-hub
+   cd Community-Application
    ```
 
 2. Create and activate a virtual environment
