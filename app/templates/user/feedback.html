@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block title %}Provide Feedback - Community Helper Hub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Rate Your Experience</h3>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Service: {{ service_request.title }}</h5>
+                    <p class="text-muted">Helper ID: {{ service_request.helper_id }}</p>
+
+                    <form method="POST" action="{{ url_for('user.submit_feedback', request_id=service_request.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Rating</label>
+                            <div class="rating-input">
+                                <div class="btn-group" role="group">
+                                    {% for i in range(1, 6) %}
+                                    <input type="radio" class="btn-check" name="rating" id="rating{{ i }}"
+                                        value="{{ i }}" required>
+                                    <label class="btn btn-outline-warning" for="rating{{ i }}">{{ i }} <i
+                                            class="fas fa-star"></i></label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="review" class="form-label">Your Review</label>
+                            <textarea class="form-control" id="review" name="review" rows="4"
+                                placeholder="Share your experience..." required></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <a href="{{ url_for('user.view_request', request_id=service_request.id) }}"
+                                class="btn btn-secondary me-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

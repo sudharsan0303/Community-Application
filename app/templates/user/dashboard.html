@@ -1,0 +1,466 @@
+{% extends "layout.html" %}
+
+{% block title %}User Dashboard - Community Helper Hub{% endblock %}
+
+{% block additional_css %}
+<style>
+    .dashboard-container {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: var(--space-lg);
+        margin: var(--space-lg) 0;
+    }
+    
+    .sidebar {
+        background-color: var(--color-card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--color-card-border);
+        padding: var(--space-md);
+        height: fit-content;
+    }
+    
+    .user-info {
+        text-align: center;
+        padding-bottom: var(--space-md);
+        margin-bottom: var(--space-md);
+        border-bottom: 1px solid var(--color-border);
+    }
+    
+    .user-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto var(--space-md);
+        border: 3px solid var(--color-bg-accent);
+    }
+    
+    .user-name {
+        font-weight: 600;
+        margin-bottom: var(--space-xs);
+    }
+    
+    .user-email {
+        color: var(--color-text-tertiary);
+        font-size: var(--font-size-sm);
+        margin-bottom: var(--space-md);
+    }
+    
+    .nav-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .nav-item {
+        margin-bottom: var(--space-xs);
+    }
+    
+    .nav-link {
+        display: flex;
+        align-items: center;
+        padding: var(--space-sm) var(--space-md);
+        border-radius: var(--radius-md);
+        color: var(--color-text-primary);
+        text-decoration: none;
+        transition: var(--transition-normal);
+    }
+    
+    .nav-link:hover {
+        background-color: var(--color-bg-secondary);
+    }
+    
+    .nav-link.active {
+        background-color: var(--color-bg-accent);
+        color: white;
+    }
+    
+    .nav-icon {
+        margin-right: var(--space-sm);
+        width: 20px;
+        text-align: center;
+    }
+    
+    .main-content {
+        min-height: 500px;
+    }
+    
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-lg);
+    }
+    
+    .dashboard-title {
+        margin: 0;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-md);
+        margin-bottom: var(--space-lg);
+    }
+    
+    .stat-card {
+        background-color: var(--color-card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--color-card-border);
+        padding: var(--space-md);
+        text-align: center;
+    }
+    
+    .stat-value {
+        font-size: var(--font-size-2xl);
+        font-weight: 700;
+        color: var(--color-bg-accent);
+        margin-bottom: var(--space-xs);
+    }
+    
+    .stat-label {
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-sm);
+    }
+    
+    .requests-section,
+    .activity-section {
+        background-color: var(--color-card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--color-card-border);
+        padding: var(--space-lg);
+        margin-bottom: var(--space-lg);
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-md);
+    }
+    
+    .section-title {
+        margin: 0;
+    }
+    
+    .request-list,
+    .activity-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .request-item,
+    .activity-item {
+        padding: var(--space-md);
+        border-bottom: 1px solid var(--color-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .request-item:last-child,
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+    
+    .request-info,
+    .activity-info {
+        flex: 1;
+    }
+    
+    .request-title,
+    .activity-title {
+        font-weight: 600;
+        margin-bottom: var(--space-xs);
+    }
+    
+    .request-meta,
+    .activity-meta {
+        display: flex;
+        color: var(--color-text-tertiary);
+        font-size: var(--font-size-sm);
+    }
+    
+    .meta-item {
+        display: flex;
+        align-items: center;
+        margin-right: var(--space-md);
+    }
+    
+    .meta-icon {
+        margin-right: var(--space-xs);
+    }
+    
+    .request-status {
+        padding: var(--space-xs) var(--space-sm);
+        border-radius: var(--radius-md);
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+    }
+    
+    .status-pending {
+        background-color: var(--color-status-pending-bg);
+        color: var(--color-status-pending-text);
+    }
+    
+    .status-accepted {
+        background-color: var(--color-status-accepted-bg);
+        color: var(--color-status-accepted-text);
+    }
+    
+    .status-completed {
+        background-color: var(--color-status-completed-bg);
+        color: var(--color-status-completed-text);
+    }
+    
+    .status-cancelled {
+        background-color: var(--color-status-cancelled-bg);
+        color: var(--color-status-cancelled-text);
+    }
+    
+    .activity-time {
+        color: var(--color-text-tertiary);
+        font-size: var(--font-size-sm);
+        white-space: nowrap;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: var(--space-xl) 0;
+        color: var(--color-text-tertiary);
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: var(--space-md);
+        opacity: 0.5;
+    }
+    
+    @media (max-width: 768px) {
+        .dashboard-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .sidebar {
+            margin-bottom: var(--space-md);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            text-align: left;
+        }
+        
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            margin: 0 var(--space-md) 0 0;
+        }
+        
+        .nav-menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+        }
+        
+        .nav-item {
+            margin-bottom: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <div class="user-info">
+                <img src="{{ user.profile_picture or 'https://via.placeholder.com/150' }}" alt="{{ user.name }}" class="user-avatar">
+                <h3 class="user-name">{{ user.name }}</h3>
+                <p class="user-email">{{ user.email }}</p>
+                <a href="{{ url_for('auth.profile') }}" class="btn btn-outline btn-sm">Edit Profile</a>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="{{ url_for('user.dashboard') }}" class="nav-link active">
+                        <span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('user.my_requests') }}" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-clipboard-list"></i></span>
+                        My Requests
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('user.new_request') }}" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-plus-circle"></i></span>
+                        New Request
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('user.messages') }}" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-envelope"></i></span>
+                        Messages
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('user.feedback_history') }}" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-star"></i></span>
+                        Feedback
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('user.settings') }}" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                        Settings
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Dashboard</h1>
+                                <a href="{{ url_for('user.new_request') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create New Request
+                </a>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.total_requests }}</div>
+                    <div class="stat-label">Total Requests</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.pending_requests }}</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.completed_requests }}</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.feedback_given }}</div>
+                    <div class="stat-label">Feedback Given</div>
+                </div>
+            </div>
+            
+            <div class="requests-section">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Requests</h2>
+                    <a href="{{ url_for('user.my_requests') }}" class="btn btn-text">View All</a>
+                </div>
+                
+                {% if recent_requests %}
+                <ul class="request-list">
+                    {% for request in recent_requests %}
+                    <li class="request-item">
+                        <div class="request-info">
+                            <h3 class="request-title">{{ request.title }}</h3>
+                            <div class="request-meta">
+                                <span class="meta-item">
+                                    <i class="fas fa-calendar meta-icon"></i>
+                                    {{ request.date_requested }}
+                                </span>
+                                <span class="meta-item">
+                                    <i class="fas fa-tag meta-icon"></i>
+                                    {{ request.category }}
+                                </span>
+                                {% if request.helper %}
+                                <span class="meta-item">
+                                    <i class="fas fa-user meta-icon"></i>
+                                    {{ request.helper.name }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="request-status status-{{ request.status.lower() }}">{{ request.status }}</div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <h3>No requests yet</h3>
+                    <p>Create your first service request to get help from community members.</p>
+                    <a href="/user/request/new" class="btn btn-primary mt-3">
+                        <i class="fas fa-plus-circle"></i> Create Request
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="activity-section">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Activity</h2>
+                </div>
+                
+                {% if recent_activity %}
+                <ul class="activity-list">
+                    {% for activity in recent_activity %}
+                    <li class="activity-item">
+                        <div class="activity-info">
+                            <h3 class="activity-title">{{ activity.description }}</h3>
+                            <div class="activity-meta">
+                                <span class="meta-item">
+                                    <i class="fas fa-clipboard-list meta-icon"></i>
+                                    {{ activity.related_to }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="activity-time">{{ activity.time_ago }}</div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fas fa-history"></i></div>
+                    <h3>No recent activity</h3>
+                    <p>Your recent activities will appear here.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add any dashboard-specific JavaScript here
+        
+        // Example: Animate stats on page load
+        const statValues = document.querySelectorAll('.stat-value');
+        
+        statValues.forEach(stat => {
+            const finalValue = stat.textContent;
+            let startValue = 0;
+            const duration = 1000;
+            const increment = Math.ceil(finalValue / (duration / 20));
+            
+            const animateValue = () => {
+                startValue += increment;
+                if (startValue > finalValue) {
+                    stat.textContent = finalValue;
+                } else {
+                    stat.textContent = startValue;
+                    requestAnimationFrame(animateValue);
+                }
+            };
+            
+            animateValue();
+        });
+    });
+</script>
+{% endblock %}

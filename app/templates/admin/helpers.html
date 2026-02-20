@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block title %}Manage Helpers - Community Helper Hub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Manage Helpers</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Helper Name</th>
+                            <th>Skills</th>
+                            <th>Experience</th>
+                            <th>Status</th>
+                            <th>Rating</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for profile in helper_profiles %}
+                        <tr>
+                            <td>{{ profile.helper.id }}</td>
+                            <td>{{ profile.user.name }}</td>
+                            <td>{{ profile.helper.skills }}</td>
+                            <td>{{ profile.helper.experience }}</td>
+                            <td>
+                                {% if profile.helper.verified %}
+                                <span class="badge bg-success">Verified</span>
+                                {% else %}
+                                <span class="badge bg-warning">Unverified</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ "%.1f"|format(profile.helper.rating) }} ({{ profile.helper.total_ratings }})</td>
+                            <td>
+                                <a href="{{ url_for('admin.verification_review', verification_id=profile.helper.id) }}"
+                                    class="btn btn-sm btn-info">Verify</a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">No helpers found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

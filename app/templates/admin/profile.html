@@ -1,0 +1,396 @@
+{% extends "layout.html" %}
+
+{% block title %}Admin Profile - Community Helper Hub{% endblock %}
+
+{% block additional_css %}
+<style>
+    .profile-container {
+        max-width: 800px;
+        margin: var(--space-xl) auto;
+    }
+
+    .profile-header {
+        text-align: center;
+        margin-bottom: var(--space-xl);
+    }
+
+    .profile-title {
+        margin-bottom: var(--space-md);
+    }
+
+    .profile-subtitle {
+        color: var(--color-text-secondary);
+        margin-bottom: var(--space-lg);
+    }
+
+    .profile-card {
+        background-color: var(--color-card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--color-card-border);
+        padding: var(--space-lg);
+        margin-bottom: var(--space-lg);
+    }
+
+    .profile-section-title {
+        margin-top: 0;
+        margin-bottom: var(--space-md);
+        padding-bottom: var(--space-sm);
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .profile-avatar-section {
+        display: flex;
+        align-items: center;
+        margin-bottom: var(--space-lg);
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: var(--space-lg);
+        border: 3px solid var(--color-bg-accent);
+    }
+
+    .avatar-upload {
+        flex: 1;
+    }
+
+    .avatar-upload-label {
+        display: block;
+        margin-bottom: var(--space-sm);
+        font-weight: 600;
+    }
+
+    .form-group {
+        margin-bottom: var(--space-md);
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: var(--space-xs);
+        font-weight: 600;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+        width: 100%;
+        padding: var(--space-sm);
+        border: 1px solid var(--color-form-border);
+        border-radius: var(--radius-md);
+        background-color: var(--color-form-bg);
+        color: var(--color-text-primary);
+        font-size: var(--font-size-base);
+        transition: var(--transition-normal);
+    }
+
+    .form-input:focus,
+    .form-textarea:focus,
+    .form-select:focus {
+        border-color: var(--color-bg-accent);
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(var(--color-bg-accent-rgb), 0.2);
+    }
+
+    .form-textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .form-row {
+        display: flex;
+        gap: var(--space-md);
+    }
+
+    .form-col {
+        flex: 1;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--space-md);
+        margin-top: var(--space-lg);
+    }
+
+    .security-section {
+        margin-top: var(--space-xl);
+    }
+
+    .password-requirements {
+        margin-top: var(--space-sm);
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+    }
+
+    .requirement-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: var(--space-xs);
+    }
+
+    .requirement-icon {
+        margin-right: var(--space-xs);
+        color: var(--color-status-pending-text);
+    }
+
+    .requirement-icon.valid {
+        color: var(--color-status-completed-text);
+    }
+
+    @media (max-width: 768px) {
+        .profile-avatar-section {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            margin-right: 0;
+            margin-bottom: var(--space-md);
+        }
+
+        .form-row {
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="profile-container">
+        <div class="profile-header">
+            <h1 class="profile-title">Admin Profile</h1>
+            <p class="profile-subtitle">Manage your account information and security settings</p>
+        </div>
+
+        <form action="/admin/profile/update" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <div class="profile-card">
+                <h2 class="profile-section-title">Profile Information</h2>
+
+                <div class="profile-avatar-section">
+                    <img src="{{ admin.profile_picture or 'https://via.placeholder.com/150' }}" alt="{{ admin.name }}"
+                        class="profile-avatar">
+
+                    <div class="avatar-upload">
+                        <label for="profile_picture" class="avatar-upload-label">Profile Picture</label>
+                        <input type="file" id="profile_picture" name="profile_picture" class="form-input"
+                            accept="image/*">
+                        <p class="form-help">Recommended size: 300x300 pixels (JPG, PNG)</p>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" id="name" name="name" class="form-input" value="{{ admin.name }}"
+                                required>
+                        </div>
+                    </div>
+
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" id="email" name="email" class="form-input" value="{{ admin.email }}"
+                                required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" class="form-input" value="{{ admin.phone }}">
+                        </div>
+                    </div>
+
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="role" class="form-label">Admin Role</label>
+                            <select id="role" name="role" class="form-select">
+                                <option value="super_admin" {% if admin.role=='super_admin' %}selected{% endif %}>Super
+                                    Admin</option>
+                                <option value="admin" {% if admin.role=='admin' %}selected{% endif %}>Admin</option>
+                                <option value="moderator" {% if admin.role=='moderator' %}selected{% endif %}>Moderator
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="bio" class="form-label">Bio</label>
+                    <textarea id="bio" name="bio" class="form-textarea">{{ admin.bio }}</textarea>
+                </div>
+            </div>
+
+            <div class="profile-card security-section">
+                <h2 class="profile-section-title">Security Settings</h2>
+
+                <div class="form-group">
+                    <label for="current_password" class="form-label">Current Password</label>
+                    <input type="password" id="current_password" name="current_password" class="form-input">
+                    <p class="form-help">Required to change password</p>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="new_password" class="form-label">New Password</label>
+                            <input type="password" id="new_password" name="new_password" class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="confirm_password" class="form-label">Confirm New Password</label>
+                            <input type="password" id="confirm_password" name="confirm_password" class="form-input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="password-requirements">
+                    <p>Password must meet the following requirements:</p>
+                    <div class="requirement-item">
+                        <span class="requirement-icon" id="req-length"><i class="fas fa-circle"></i></span>
+                        At least 8 characters long
+                    </div>
+                    <div class="requirement-item">
+                        <span class="requirement-icon" id="req-uppercase"><i class="fas fa-circle"></i></span>
+                        At least one uppercase letter
+                    </div>
+                    <div class="requirement-item">
+                        <span class="requirement-icon" id="req-lowercase"><i class="fas fa-circle"></i></span>
+                        At least one lowercase letter
+                    </div>
+                    <div class="requirement-item">
+                        <span class="requirement-icon" id="req-number"><i class="fas fa-circle"></i></span>
+                        At least one number
+                    </div>
+                    <div class="requirement-item">
+                        <span class="requirement-icon" id="req-special"><i class="fas fa-circle"></i></span>
+                        At least one special character
+                    </div>
+                    <div class="requirement-item">
+                        <span class="requirement-icon" id="req-match"><i class="fas fa-circle"></i></span>
+                        Passwords match
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-checkbox">
+                        <input type="checkbox" name="two_factor" {% if admin.two_factor_enabled %}checked{% endif %}>
+                        <span>Enable Two-Factor Authentication</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="/admin/dashboard" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const newPasswordInput = document.getElementById('new_password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+
+        const reqLength = document.getElementById('req-length');
+        const reqUppercase = document.getElementById('req-uppercase');
+        const reqLowercase = document.getElementById('req-lowercase');
+        const reqNumber = document.getElementById('req-number');
+        const reqSpecial = document.getElementById('req-special');
+        const reqMatch = document.getElementById('req-match');
+
+        function validatePassword() {
+            const password = newPasswordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+
+            // Check length
+            if (password.length >= 8) {
+                reqLength.innerHTML = '<i class="fas fa-check-circle"></i>';
+                reqLength.classList.add('valid');
+            } else {
+                reqLength.innerHTML = '<i class="fas fa-circle"></i>';
+                reqLength.classList.remove('valid');
+            }
+
+            // Check uppercase
+            if (/[A-Z]/.test(password)) {
+                reqUppercase.innerHTML = '<i class="fas fa-check-circle"></i>';
+                reqUppercase.classList.add('valid');
+            } else {
+                reqUppercase.innerHTML = '<i class="fas fa-circle"></i>';
+                reqUppercase.classList.remove('valid');
+            }
+
+            // Check lowercase
+            if (/[a-z]/.test(password)) {
+                reqLowercase.innerHTML = '<i class="fas fa-check-circle"></i>';
+                reqLowercase.classList.add('valid');
+            } else {
+                reqLowercase.innerHTML = '<i class="fas fa-circle"></i>';
+                reqLowercase.classList.remove('valid');
+            }
+
+            // Check number
+            if (/[0-9]/.test(password)) {
+                reqNumber.innerHTML = '<i class="fas fa-check-circle"></i>';
+                reqNumber.classList.add('valid');
+            } else {
+                reqNumber.innerHTML = '<i class="fas fa-circle"></i>';
+                reqNumber.classList.remove('valid');
+            }
+
+            // Check special character
+            if (/[^A-Za-z0-9]/.test(password)) {
+                reqSpecial.innerHTML = '<i class="fas fa-check-circle"></i>';
+                reqSpecial.classList.add('valid');
+            } else {
+                reqSpecial.innerHTML = '<i class="fas fa-circle"></i>';
+                reqSpecial.classList.remove('valid');
+            }
+
+            // Check passwords match
+            if (password && password === confirmPassword) {
+                reqMatch.innerHTML = '<i class="fas fa-check-circle"></i>';
+                reqMatch.classList.add('valid');
+            } else {
+                reqMatch.innerHTML = '<i class="fas fa-circle"></i>';
+                reqMatch.classList.remove('valid');
+            }
+        }
+
+        newPasswordInput.addEventListener('input', validatePassword);
+        confirmPasswordInput.addEventListener('input', validatePassword);
+
+        // Handle profile picture preview
+        const profilePictureInput = document.getElementById('profile_picture');
+        const profileAvatar = document.querySelector('.profile-avatar');
+
+        profilePictureInput.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    profileAvatar.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+</script>
+{% endblock %}

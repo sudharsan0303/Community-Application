@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block title %}Complete Helper Profile{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <h2>Complete Your Helper Profile</h2>
+    <p class="lead">Please provide additional details to get started as a helper.</p>
+
+    <form method="POST" action="{{ url_for('helper.complete_profile') }}" class="auth-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-group">
+            <label for="skills">Skills (comma separated) <span class="text-danger">*</span></label>
+            <input type="text" id="skills" name="skills" required class="form-control"
+                placeholder="e.g., Plumbing, Electrical, Carpentry">
+            <small class="form-text text-muted">Separate multiple skills with commas.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="experience">Years of Experience</label>
+            <input type="number" id="experience" name="experience" class="form-control" min="0" value="0">
+        </div>
+
+        <div class="form-group">
+            <label for="availability">Availability <span class="text-danger">*</span></label>
+            <select id="availability" name="availability" required class="form-control">
+                <option value="">Select Availability</option>
+                <option value="weekdays">Weekdays</option>
+                <option value="weekends">Weekends</option>
+                <option value="both">Both</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Profile & Continue</button>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary ml-2">Cancel</a>
+    </form>
+</div>
+{% endblock %}

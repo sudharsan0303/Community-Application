@@ -1,0 +1,111 @@
+{% extends "layout.html" %}
+
+{% block title %}My Profile - Community Helper Hub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <img src="{{ user.profile_picture or url_for('static', filename='images/default_profile.png') }}"
+                        class="rounded-circle img-fluid mb-3" style="width: 150px; height: 150px; object-fit: cover;"
+                        alt="Profile Picture">
+                    <h3>{{ user.name }}</h3>
+                    <p class="text-muted">{{ user.email }}</p>
+                    <div class="mb-2">
+                        {% if helper.verified %}
+                        <span class="badge bg-success">Verified Helper</span>
+                        {% else %}
+                        <span class="badge bg-warning">Verification Pending</span>
+                        {% endif %}
+                    </div>
+                    <div class="rating">
+                        {% for i in range(helper.rating|int) %}
+                        <i class="fas fa-star text-warning"></i>
+                        {% endfor %}
+                        ({{ helper.total_ratings }} reviews)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Edit Profile</h4>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('helper.update_profile') }}" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="name" name="name" value="{{ user.name }}"
+                                    required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label">Phone</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" value="{{ user.phone }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Address</label>
+                            <textarea class="form-control" id="address" name="address"
+                                rows="2">{{ user.address }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="skills" class="form-label">Skills (comma separated)</label>
+                            <input type="text" class="form-control" id="skills" name="skills"
+                                value="{{ helper.skills }}">
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="experience" class="form-label">Experience</label>
+                                <input type="text" class="form-control" id="experience" name="experience"
+                                    value="{{ helper.experience }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="availability" class="form-label">Availability</label>
+                                <input type="text" class="form-control" id="availability" name="availability"
+                                    value="{{ helper.availability }}">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4>Recent Feedback</h4>
+                </div>
+                <div class="card-body">
+                    {% for feedback_item in feedback_list %}
+                    <div class="border-bottom pb-3 mb-3">
+                        <div class="d-flex justify-content-between">
+                            <h5>{{ feedback_item.user_name }}</h5>
+                            <!-- Assuming user_name is joined or available, logic might need adjustment but loop variable is feedback object -->
+                            <div>
+                                {% for i in range(feedback_item.rating) %}
+                                <i class="fas fa-star text-warning"></i>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <p class="text-muted mb-1">{{ feedback_item.created_at }}</p>
+                        <p>{{ feedback_item.review }}</p>
+                    </div>
+                    {% else %}
+                    <p class="text-center text-muted">No feedback yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block title %}All Service Requests - Community Helper Hub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">All Service Requests</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>User</th>
+                            <th>Assigned Helper</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in requests %}
+                        <tr>
+                            <td>{{ item.request.id }}</td>
+                            <td>{{ item.request.title }}</td>
+                            <td>{{ item.user.name if item.user else 'Unknown' }}</td>
+                            <td>{{ item.helper_user.name if item.helper_user else 'Unassigned' }}</td>
+                            <td>
+                                <span class="badge bg-secondary">{{ item.request.status }}</span>
+                            </td>
+                            <td>{{ item.request.created_at }}</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary">View</a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">No service requests found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

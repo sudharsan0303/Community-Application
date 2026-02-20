@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block title %}Make Admin - Community Helper Hub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Promote User to Admin</h2>
+    <p class="text-muted">Select a user to grant administrator privileges.</p>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('admin.make_admin') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                <div class="mb-3">
+                    <label for="user_id" class="form-label">Select User</label>
+                    <select name="user_id" id="user_id" class="form-select" required>
+                        <option value="">-- Select a User --</option>
+                        {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.name }} ({{ user.email }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="confirm" required>
+                    <label class="form-check-label" for="confirm">I confirm that I want to grant admin access to this
+                        user.</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Make Admin</button>
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

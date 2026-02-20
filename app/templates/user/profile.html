@@ -1,0 +1,278 @@
+{% extends "layout.html" %}
+
+{% block title %}User Profile{% endblock %}
+
+{% block additional_css %}
+<style>
+    .profile-container {
+        max-width: 900px;
+        margin: 2rem auto;
+    }
+
+    .profile-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 2rem;
+        border: 4px solid #3498db;
+    }
+
+    .profile-title {
+        color: #2c3e50;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .profile-subtitle {
+        color: #7f8c8d;
+        margin: 0.5rem 0 0;
+        font-weight: 400;
+    }
+
+    .profile-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-section-title {
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 0.5rem;
+    }
+
+    .profile-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-item {
+        margin-bottom: 0.5rem;
+    }
+
+    .detail-label {
+        font-weight: 500;
+        color: #7f8c8d;
+        margin-bottom: 0.25rem;
+    }
+
+    .detail-value {
+        font-weight: 400;
+        color: #2c3e50;
+    }
+
+    .btn-edit {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 0.5rem 1.5rem;
+        border-radius: 5px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn-edit:hover {
+        background-color: #2980b9;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #34495e;
+    }
+
+    .form-control {
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        padding: 0.75rem;
+        font-size: 1rem;
+        width: 100%;
+    }
+
+    .form-control:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+
+    .btn-save {
+        background-color: #2ecc71;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 5px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn-save:hover {
+        background-color: #27ae60;
+    }
+
+    .btn-cancel {
+        background-color: #95a5a6;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 5px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-right: 1rem;
+    }
+
+    .btn-cancel:hover {
+        background-color: #7f8c8d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container profile-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}" role="alert">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <div class="profile-header">
+        <img src="{{ user.avatar }}" alt="User Avatar" class="profile-avatar">
+        <div>
+            <h2 class="profile-title">{{ user.name }}</h2>
+            <p class="profile-subtitle">Member since {{ user.member_since }}</p>
+            <button class="btn-edit mt-2" id="edit-profile-btn">
+                <i class="fas fa-edit"></i> Edit Profile
+            </button>
+        </div>
+    </div>
+
+    <!-- Profile Information Card -->
+    <div class="profile-card" id="profile-info">
+        <h3 class="profile-section-title">Personal Information</h3>
+        <div class="profile-details">
+            <div class="detail-item">
+                <div class="detail-label">Full Name</div>
+                <div class="detail-value">{{ user.name }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Email</div>
+                <div class="detail-value">{{ user.email }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Phone</div>
+                <div class="detail-value">{{ user.phone }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Location</div>
+                <div class="detail-value">{{ user.location }}</div>
+            </div>
+        </div>
+
+        <h3 class="profile-section-title">Account Information</h3>
+        <div class="profile-details">
+            <div class="detail-item">
+                <div class="detail-label">User Type</div>
+                <div class="detail-value">{{ user.user_type }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Account Status</div>
+                <div class="detail-value">{{ user.account_status }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Last Login</div>
+                <div class="detail-value">{{ user.last_login }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Form (Hidden by default) -->
+    <div class="profile-card" id="edit-profile-form" style="display: none;">
+        <h3 class="profile-section-title">Edit Profile</h3>
+        <form method="POST" action="{{ url_for('user.profile') }}" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <div class="form-group">
+                <label for="fullName" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="fullName" name="name" value="{{ user.name }}">
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
+            </div>
+
+            <div class="form-group">
+                <label for="phone" class="form-label">Phone</label>
+                <input type="tel" class="form-control" id="phone" name="phone" value="{{ user.phone }}">
+            </div>
+
+            <div class="form-group">
+                <label for="location" class="form-label">Location</label>
+                <input type="text" class="form-control" id="location" name="location" value="{{ user.location }}">
+            </div>
+
+            <div class="form-group">
+                <label for="avatar" class="form-label">Profile Picture</label>
+                <input type="file" class="form-control" id="avatar" name="profile_picture">
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">New Password</label>
+                <input type="password" class="form-control" id="password"
+                    placeholder="Leave blank to keep current password">
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                <input type="password" class="form-control" id="confirmPassword"
+                    placeholder="Leave blank to keep current password">
+            </div>
+
+            <div class="form-group">
+                <button type="button" class="btn-cancel" id="cancel-edit-btn">Cancel</button>
+                <button type="submit" class="btn-save">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const editProfileBtn = document.getElementById('edit-profile-btn');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        const profileInfo = document.getElementById('profile-info');
+        const editProfileForm = document.getElementById('edit-profile-form');
+
+        editProfileBtn.addEventListener('click', function () {
+            profileInfo.style.display = 'none';
+            editProfileForm.style.display = 'block';
+        });
+
+        cancelEditBtn.addEventListener('click', function () {
+            profileInfo.style.display = 'block';
+            editProfileForm.style.display = 'none';
+        });
+    });
+</script>
+{% endblock %}

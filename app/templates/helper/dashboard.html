@@ -1,0 +1,661 @@
+{% extends "layout.html" %}
+
+{% block title %}Helper Dashboard - Community Helper Hub{% endblock %}
+
+{% block additional_css %}
+<style>
+    .dashboard-container {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: var(--space-lg);
+        margin: var(--space-lg) 0;
+    }
+
+    .sidebar {
+        background-color: var(--color-card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--color-card-border);
+        padding: var(--space-md);
+        height: fit-content;
+    }
+
+    .helper-info {
+        text-align: center;
+        padding-bottom: var(--space-md);
+        margin-bottom: var(--space-md);
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .helper-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto var(--space-md);
+        border: 3px solid var(--color-bg-accent);
+    }
+
+    .helper-name {
+        font-weight: 600;
+        margin-bottom: var(--space-xs);
+    }
+
+    .helper-rating {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: var(--space-xs);
+    }
+
+    .helper-rating .stars {
+        color: var(--color-star-active);
+        margin-right: var(--space-xs);
+    }
+
+    .helper-rating .count {
+        color: var(--color-text-tertiary);
+        font-size: var(--font-size-sm);
+    }
+
+    .helper-status {
+        display: inline-block;
+        padding: var(--space-xs) var(--space-sm);
+        border-radius: var(--radius-full);
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        margin-bottom: var(--space-md);
+    }
+
+    .status-available {
+        background-color: var(--color-status-completed-bg);
+        color: var(--color-status-completed-text);
+    }
+
+    .status-busy {
+        background-color: var(--color-status-pending-bg);
+        color: var(--color-status-pending-text);
+    }
+
+    .status-unavailable {
+        background-color: var(--color-status-cancelled-bg);
+        color: var(--color-status-cancelled-text);
+    }
+
+    .nav-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .nav-item {
+        margin-bottom: var(--space-xs);
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        padding: var(--space-sm) var(--space-md);
+        border-radius: var(--radius-md);
+        color: var(--color-text-primary);
+        text-decoration: none;
+        transition: var(--transition-normal);
+    }
+
+    .nav-link:hover {
+        background-color: var(--color-bg-secondary);
+    }
+
+    .nav-link.active {
+        background-color: var(--color-bg-accent);
+        color: white;
+    }
+
+    .nav-icon {
+        margin-right: var(--space-sm);
+        width: 20px;
+        text-align: center;
+    }
+
+    .main-content {
+        min-height: 500px;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-lg);
+    }
+
+    .dashboard-title {
+        margin: 0;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-md);
+        margin-bottom: var(--space-lg);
+    }
+
+    .stat-card {
+        background-color: var(--color-card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--color-card-border);
+        padding: var(--space-md);
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: var(--font-size-2xl);
+        font-weight: 700;
+        color: var(--color-bg-accent);
+        margin-bottom: var(--space-xs);
+    }
+
+    .stat-label {
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-sm);
+    }
+
+    .requests-section,
+    .feedback-section {
+        background-color: var(--color-card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--color-card-border);
+        padding: var(--space-lg);
+        margin-bottom: var(--space-lg);
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-md);
+    }
+
+    .section-title {
+        margin: 0;
+    }
+
+    .request-list,
+    .feedback-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .request-item,
+    .feedback-item {
+        padding: var(--space-md);
+        border-bottom: 1px solid var(--color-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .request-item:last-child,
+    .feedback-item:last-child {
+        border-bottom: none;
+    }
+
+    .request-info,
+    .feedback-info {
+        flex: 1;
+    }
+
+    .request-title,
+    .feedback-title {
+        font-weight: 600;
+        margin-bottom: var(--space-xs);
+    }
+
+    .request-meta,
+    .feedback-meta {
+        display: flex;
+        color: var(--color-text-tertiary);
+        font-size: var(--font-size-sm);
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        margin-right: var(--space-md);
+    }
+
+    .meta-icon {
+        margin-right: var(--space-xs);
+    }
+
+    .request-actions {
+        display: flex;
+        gap: var(--space-sm);
+    }
+
+    .request-status {
+        padding: var(--space-xs) var(--space-sm);
+        border-radius: var(--radius-md);
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+    }
+
+    .status-pending {
+        background-color: var(--color-status-pending-bg);
+        color: var(--color-status-pending-text);
+    }
+
+    .status-accepted {
+        background-color: var(--color-status-accepted-bg);
+        color: var(--color-status-accepted-text);
+    }
+
+    .status-completed {
+        background-color: var(--color-status-completed-bg);
+        color: var(--color-status-completed-text);
+    }
+
+    .status-cancelled {
+        background-color: var(--color-status-cancelled-bg);
+        color: var(--color-status-cancelled-text);
+    }
+
+    .feedback-rating {
+        color: var(--color-star-active);
+        margin-right: var(--space-md);
+    }
+
+    .feedback-date {
+        color: var(--color-text-tertiary);
+        font-size: var(--font-size-sm);
+        white-space: nowrap;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: var(--space-xl) 0;
+        color: var(--color-text-tertiary);
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: var(--space-md);
+        opacity: 0.5;
+    }
+
+    .availability-toggle {
+        display: flex;
+        align-items: center;
+        margin-top: var(--space-md);
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+        margin-right: var(--space-md);
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 34px;
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked+.toggle-slider {
+        background-color: var(--color-bg-accent);
+    }
+
+    input:focus+.toggle-slider {
+        box-shadow: 0 0 1px var(--color-bg-accent);
+    }
+
+    input:checked+.toggle-slider:before {
+        transform: translateX(26px);
+    }
+
+    .toggle-label {
+        font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-container {
+            grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+            margin-bottom: var(--space-md);
+        }
+
+        .helper-info {
+            display: flex;
+            align-items: center;
+            text-align: left;
+        }
+
+        .helper-avatar {
+            width: 60px;
+            height: 60px;
+            margin: 0 var(--space-md) 0 0;
+        }
+
+        .helper-details {
+            flex: 1;
+        }
+
+        .helper-rating {
+            justify-content: flex-start;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+        }
+
+        .nav-item {
+            margin-bottom: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <div class="helper-info">
+                <img src="{{ user.profile_picture or 'https://via.placeholder.com/150' }}" alt="{{ user.name }}"
+                    class="helper-avatar">
+                <div class="helper-details">
+                    <h3 class="helper-name">{{ user.name }}</h3>
+                    <div class="helper-rating">
+                        <div class="stars">
+                            {% for i in range(5) %}
+                            {% if i < helper.rating|int %} <i class="fas fa-star"></i>
+                                {% elif (i + 0.5) <= helper.rating %} <i class="fas fa-star-half-alt"></i>
+                                    {% else %}
+                                    <i class="far fa-star"></i>
+                                    {% endif %}
+                                    {% endfor %}
+                        </div>
+                        <span class="count">({{ helper.total_ratings }})</span>
+                    </div>
+                    <div class="helper-status status-{{ (helper.availability or 'unavailable')|lower }}">{{
+                        helper.availability or 'Unavailable' }}</div>
+                    <div class="availability-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="availabilityToggle" {% if helper.availability and
+                                helper.availability|lower in ['available', 'weekdays' , 'weekends' , 'both' ]
+                                %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-label">Available for Requests</span>
+                    </div>
+                </div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/helper/dashboard" class="nav-link active">
+                        <span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/helper/requests" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-clipboard-list"></i></span>
+                        Service Requests
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/helper/schedule" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
+                        My Schedule
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/helper/messages" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-envelope"></i></span>
+                        Messages
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/helper/feedback" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-star"></i></span>
+                        My Feedback
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/helper/profile" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-user"></i></span>
+                        Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/helper/settings" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                        Settings
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Helper Dashboard</h1>
+                <a href="/helper/requests" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Browse Requests
+                </a>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.completed_jobs }}</div>
+                    <div class="stat-label">Completed Services</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.in_progress_jobs }}</div>
+                    <div class="stat-label">Active Requests</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.rating }}</div>
+                    <div class="stat-label">Average Rating</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.total_jobs }}</div>
+                    <div class="stat-label">Total Jobs</div>
+                </div>
+            </div>
+
+            <div class="requests-section">
+                <div class="section-header">
+                    <h2 class="section-title">Active Requests</h2>
+                    <a href="/helper/requests" class="btn btn-text">View All</a>
+                </div>
+
+                {% if service_requests %}
+                <ul class="request-list">
+                    {% for request in service_requests %}
+                    <li class="request-item">
+                        <div class="request-info">
+                            <h3 class="request-title">{{ request.title }}</h3>
+                            <div class="request-meta">
+                                <span class="meta-item">
+                                    <i class="fas fa-calendar meta-icon"></i>
+                                    {{ request.created_at }}
+                                </span>
+                                <span class="meta-item">
+                                    <i class="fas fa-tag meta-icon"></i>
+                                    {{ request.category }}
+                                </span>
+                                <span class="meta-item">
+                                    <i class="fas fa-info-circle meta-icon"></i>
+                                    {{ request.status }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="request-actions">
+                            <a href="/helper/request/{{ request.id }}" class="btn btn-sm btn-outline">View Details</a>
+                            {% if request.status == 'in_progress' %}
+                            <a href="/helper/request/{{ request.id }}/complete" class="btn btn-sm btn-primary">Mark
+                                Complete</a>
+                            {% endif %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <h3>No active requests</h3>
+                    <p>You don't have any active service requests at the moment.</p>
+                    <a href="/helper/requests" class="btn btn-primary mt-3">
+                        <i class="fas fa-search"></i> Browse Available Requests
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="feedback-section">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Feedback</h2>
+                    <a href="/helper/feedback" class="btn btn-text">View All</a>
+                </div>
+
+                {% if feedback_list %}
+                <ul class="feedback-list">
+                    {% for feedback in feedback_list %}
+                    <li class="feedback-item">
+                        <div class="feedback-info">
+                            <h3 class="feedback-title">Feedback</h3>
+                            <p>{{ feedback.review or 'No comment provided' }}</p>
+                        </div>
+                        <div class="feedback-details">
+                            <div class="feedback-rating">
+                                {% for i in range(5) %}
+                                {% if i < feedback.rating %} <i class="fas fa-star"></i>
+                                    {% else %}
+                                    <i class="far fa-star"></i>
+                                    {% endif %}
+                                    {% endfor %}
+                            </div>
+                            <div class="feedback-date">{{ feedback.created_at }}</div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fas fa-star"></i></div>
+                    <h3>No feedback yet</h3>
+                    <p>You haven't received any feedback from users yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle availability toggle
+        const availabilityToggle = document.getElementById('availabilityToggle');
+        const statusBadge = document.querySelector('.helper-status');
+
+        if (availabilityToggle) {
+            availabilityToggle.addEventListener('change', function () {
+                const isAvailable = this.checked;
+                const newStatus = isAvailable ? 'Available' : 'Unavailable';
+
+                // Update UI immediately for better UX
+                statusBadge.textContent = newStatus;
+                statusBadge.className = `helper-status status-${newStatus.toLowerCase()}`;
+
+                // Send status update to server
+                fetch('/helper/update-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        status: newStatus
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            // Revert UI if update failed
+                            this.checked = !isAvailable;
+                            statusBadge.textContent = isAvailable ? 'Unavailable' : 'Available';
+                            statusBadge.className = `helper-status status-${(isAvailable ? 'unavailable' : 'available')}`;
+                            alert('Failed to update status. Please try again.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error updating status:', error);
+                        // Revert UI on error
+                        this.checked = !isAvailable;
+                        statusBadge.textContent = isAvailable ? 'Unavailable' : 'Available';
+                        statusBadge.className = `helper-status status-${(isAvailable ? 'unavailable' : 'available')}`;
+                        alert('Failed to update status. Please try again.');
+                    });
+            });
+        }
+
+        // Animate stats on page load
+        const statValues = document.querySelectorAll('.stat-value');
+
+        statValues.forEach(stat => {
+            const finalValue = stat.textContent;
+            let startValue = 0;
+            const duration = 1000;
+            const increment = Math.ceil(finalValue / (duration / 20));
+
+            const animateValue = () => {
+                startValue += increment;
+                if (startValue > finalValue) {
+                    stat.textContent = finalValue;
+                } else {
+                    stat.textContent = startValue;
+                    requestAnimationFrame(animateValue);
+                }
+            };
+
+            animateValue();
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block title %}Request Details - Community Helper Hub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Service Request #{{ service_request.id }}</h2>
+        <a href="{{ url_for('helper.requests') }}" class="btn btn-secondary">Back to Requests</a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h4 class="mb-0">{{ service_request.title }}</h4>
+            <span class="badge bg-primary">{{ service_request.category }}</span>
+        </div>
+        <div class="card-body">
+            <p class="lead">{{ service_request.description }}</p>
+            <hr>
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Customer Details</h5>
+                    <p><strong>Name:</strong> {{ user.name }}</p>
+                    <p><strong>Location:</strong> {{ user.location or 'Not specified' }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h5>Request Info</h5>
+                    <p><strong>Deadline:</strong> {{ service_request.deadline }}</p>
+                    <p><strong>Status:</strong> <span class="badge bg-info">{{ service_request.status }}</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            {% if not is_assigned and service_request.status == 'open' %}
+            <form action="{{ url_for('helper.accept_request', request_id=service_request.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button type="submit" class="btn btn-success w-100">Accept Request</button>
+            </form>
+            {% elif is_assigned %}
+            {% if service_request.status == 'assigned' %}
+            <form action="{{ url_for('helper.start_request', request_id=service_request.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button type="submit" class="btn btn-primary w-100">Start Job</button>
+            </form>
+            {% elif service_request.status == 'in_progress' %}
+            <form action="{{ url_for('helper.complete_request', request_id=service_request.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button type="submit" class="btn btn-success w-100">Mark as Completed</button>
+            </form>
+            {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

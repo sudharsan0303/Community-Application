@@ -1,0 +1,186 @@
+{% extends "layout.html" %}
+
+{% block title %}Community Helper Hub - Home{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>Welcome to Community Helper Hub</h1>
+        <p class="lead">Connecting neighbors with trusted local helpers for everyday tasks</p>
+        
+        <div class="hero-buttons">
+            {% if 'user_type' not in session %}
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">Get Started</a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-lg">Sign In</a>
+            {% else %}
+                {% if session.user_type == 'user' %}
+                    <a href="{{ url_for('user.dashboard') }}" class="btn btn-primary btn-lg">My Dashboard</a>
+                    <a href="{{ url_for('user.new_request') }}" class="btn btn-outline btn-lg">Request Service</a>
+                {% elif session.user_type == 'helper' %}
+                    <a href="{{ url_for('helper.dashboard') }}" class="btn btn-primary btn-lg">My Dashboard</a>
+                    <a href="{{ url_for('helper.requests') }}" class="btn btn-outline btn-lg">Find Work</a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <h2 class="section-title">How It Works</h2>
+    
+    <div class="feature-cards">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h3>Create an Account</h3>
+            <p>Sign up as a user seeking help or as a helper offering services</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-tasks"></i>
+            </div>
+            <h3>Request Services</h3>
+            <p>Post your needs and get matched with qualified local helpers</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-handshake"></i>
+            </div>
+            <h3>Connect & Complete</h3>
+            <p>Communicate, schedule, and complete tasks with ease</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-star"></i>
+            </div>
+            <h3>Rate & Review</h3>
+            <p>Share your experience and help build a trusted community</p>
+        </div>
+    </div>
+</section>
+
+<section class="services">
+    <h2 class="section-title">Popular Services</h2>
+    
+    <div class="service-categories">
+        <div class="service-category">
+            <img src="{{ url_for('static', filename='images/home-repair.svg') }}" alt="Home Repair">
+            <h3>Home Repairs</h3>
+            <p>Find skilled helpers for minor repairs and maintenance</p>
+        </div>
+        
+        <div class="service-category">
+            <img src="{{ url_for('static', filename='images/gardening.svg') }}" alt="Gardening">
+            <h3>Gardening</h3>
+            <p>Get assistance with lawn care, planting, and garden maintenance</p>
+        </div>
+        
+        <div class="service-category">
+            <img src="{{ url_for('static', filename='images/cleaning.svg') }}" alt="Cleaning">
+            <h3>Cleaning</h3>
+            <p>Connect with helpers for home cleaning and organization</p>
+        </div>
+        
+        <div class="service-category">
+            <img src="{{ url_for('static', filename='images/errands.svg') }}" alt="Errands">
+            <h3>Errands</h3>
+            <p>Find assistance with grocery shopping, deliveries, and more</p>
+        </div>
+    </div>
+</section>
+
+<section class="testimonials">
+    <h2 class="section-title">What Our Community Says</h2>
+    
+    <div class="testimonial-slider">
+        <div class="testimonial">
+            <div class="testimonial-content">
+                <p>"I found a reliable helper for my weekly garden maintenance. The platform made it easy to connect and schedule regular visits."</p>
+            </div>
+            <div class="testimonial-author">
+                <div class="author-info">
+                    <h4>Sarah Johnson</h4>
+                    <p>Homeowner</p>
+                </div>
+                <div class="rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="testimonial">
+            <div class="testimonial-content">
+                <p>"As a helper, this platform has connected me with many clients in my neighborhood. The verification process makes everyone feel secure."</p>
+            </div>
+            <div class="testimonial-author">
+                <div class="author-info">
+                    <h4>Michael Rodriguez</h4>
+                    <p>Handyman</p>
+                </div>
+                <div class="rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="testimonial">
+            <div class="testimonial-content">
+                <p>"The Community Helper Hub has been a lifesaver for me as a busy parent. I can quickly find reliable help for various household tasks."</p>
+            </div>
+            <div class="testimonial-author">
+                <div class="author-info">
+                    <h4>Emily Chen</h4>
+                    <p>Working Parent</p>
+                </div>
+                <div class="rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta">
+    <div class="cta-content">
+        <h2>Ready to Get Started?</h2>
+        <p>Join our community today and experience the convenience of local help</p>
+        
+        <div class="cta-buttons">
+            {% if not session.user %}
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">Sign Up Now</a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-lg">Sign In</a>
+            {% else %}
+                {% if session.user.user_type == 'user' %}
+                    <a href="{{ url_for('user.new_request') }}" class="btn btn-primary btn-lg">Request Service</a>
+                {% elif session.user.user_type == 'helper' %}
+                    <a href="{{ url_for('helper.available_requests') }}" class="btn btn-primary btn-lg">Find Work</a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block additional_js %}
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+{% endblock %}

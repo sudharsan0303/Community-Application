@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block title %}Feedback Management - Community Helper Hub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Feedback Management</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Helper</th>
+                            <th>Request ID</th>
+                            <th>Rating</th>
+                            <th>Review</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in feedback_list %}
+                        <tr>
+                            <td>{{ item.feedback.id }}</td>
+                            <td>{{ item.user.name if item.user else 'Unknown' }}</td>
+                            <td>{{ item.helper_user.name if item.helper_user else 'Unknown' }}</td>
+                            <td>{{ item.service_request.id }}</td>
+                            <td>
+                                {% for i in range(item.feedback.rating) %}
+                                <i class="fas fa-star text-warning"></i>
+                                {% endfor %}
+                            </td>
+                            <td>{{ item.feedback.review }}</td>
+                            <td>{{ item.feedback.created_at }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">No feedback records found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
